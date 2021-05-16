@@ -2,6 +2,7 @@ import os
 import glob
 import psycopg2
 import pandas as pd
+import datetime
 from sql_queries import *
 
 
@@ -26,12 +27,12 @@ def process_log_file(cur, filepath):
     df = df.loc[df['page'] == 'NextSong']
 
     # convert timestamp column to datetime
-    t = pd.to_datetime(df['ts'] * 1_000_000)
+    df.ts = df['ts'].apply(lambda ts: datetime.datetime.fromtimestamp(ts/1000.0))
     
     # insert time data records
-    time_data = [t.values, t.dt.hour, t.dt.day, t.dt.week, t.dt.month, t.dt.year, t.dt.dayofweek]
+    time_data = (df['ts'], df['ts'].dt.hour, df['ts'].dt.day, df['ts'].dt.week, df['ts'].dt.month, df['ts'].dt.year, df['ts'].dt.weekday_name)
     column_labels = ('start_time', 'hour', 'day', 'week', 'month', 'year', 'weekday')
-    time_df = pd.DataFrame({key: value for key, value in zip(column_labels, time_data)})
+    time_df = pd.DataFrame(dict(zip(column_labels, time_data)))
 
     for i, row in time_df.iterrows():
         cur.execute(time_table_insert, list(row))
@@ -56,7 +57,7 @@ def process_log_file(cur, filepath):
             songid, artistid = None, None
 
         # insert songplay record
-        songplay_data = (pd.to_datetime(row.ts * 1_000_000), row.userId, row.level, songid, artistid, row.sessionId, row.location, row.userAgent)
+        songplay_data = (pd.to_datetime(row.ts), row.userId, row.level, songid, artistid, row.sessionId, row.location, row.userAgent)
         cur.execute(songplay_table_insert, songplay_data)
 
 
