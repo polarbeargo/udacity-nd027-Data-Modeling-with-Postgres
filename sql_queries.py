@@ -129,7 +129,9 @@ ON CONFLICT (start_time) DO NOTHING;
 
 # FIND SONGS
 
-song_select = ("""SELECT song_id, artists.artist_id FROM artists JOIN songs ON artists.artist_id=songs.artist_id WHERE songs.title=%s AND artists.name=%s AND ABS(songs.duration - %s) < 2""")
+song_select = ("""
+SELECT song_id, artists.artist_id FROM artists JOIN songs ON artists.artist_id=songs.artist_id WHERE songs.title=%s AND artists.name=%s AND (songs.duration - %s) < 2
+""")
 
 # QUERY LISTS
 
