@@ -29,9 +29,9 @@ def process_log_file(cur, filepath):
     t = pd.to_datetime(df['ts'] * 1_000_000)
     
     # insert time data records
-    time_data = 
+    time_data = [t.values, t.dt.hour, t.dt.day, t.dt.week, t.dt.month, t.dt.year, t.dt.dayofweek]
     column_labels = ('start_time', 'hour', 'day', 'week', 'month', 'year', 'weekday')
-    time_df = pd.DataFrame(dict(zip(column_labels, time_data)) )
+    time_df = pd.DataFrame({key: value for key, value in zip(column_labels, time_data)})
 
     for i, row in time_df.iterrows():
         cur.execute(time_table_insert, list(row))
