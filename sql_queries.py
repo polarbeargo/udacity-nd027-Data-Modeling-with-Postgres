@@ -37,7 +37,7 @@ song_id varchar PRIMARY KEY,
 title varchar,
 artist_id varchar,
 year smallint,
-duration real
+duration float
 );
 """)
 
